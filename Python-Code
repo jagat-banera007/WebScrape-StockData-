@@ -1,0 +1,30 @@
+# GETTING ALL THE IMPORTS
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+
+# BASE WEBSITE URL( MSFT = MICROSIFT CORPORATION)
+URL = "https://finance.yahoo.com/quote/MSFT/"
+
+# PUTTING REQUEST
+r = requests.get(URL)
+
+# CREATING SOUP OBJECT
+soup = BeautifulSoup(r.content,"lxml")
+
+# GETTING DATA FORM PARSED HTML PAGE USING CLASS NAME AND TAGS AND STORING THEM INTO LISTS
+Company_Name  = soup.find("h1", attrs={"class": "D(ib) Fz(18px)"})
+Numerical_Data = soup.find_all("td", attrs={"class": "Ta(end) Fw(600) Lh(14px)"})
+Columns = soup.find_all("td", attrs={"class": "C($primaryColor) W(51%)"})
+
+# STORING DATA INTO DICT OBJECT USING LOOPS
+Stock_Data = {"Company": Company_Name.text}
+
+for (i, j) in zip(Columns, Numerical_Data):
+    Stock_Data[i.text] = j.text
+
+# IMPORTING STOCK DATA INTO A PANDAS DATASET
+Dataset = pd.DataFrame.from_dict(Stock_Data, orient='index')
+
+# CREATING A EXEL(xlsx) FILE USING "to_exel" COMMAND TO IMPORT THE PANDAS DATASET INTO EXEL FILE
+Dataset.to_excel("C:\\Users\\Jagat\\Desktop\\output.xlsx")
